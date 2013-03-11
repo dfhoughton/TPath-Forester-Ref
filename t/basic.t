@@ -87,6 +87,7 @@ is $node->tag, 'e', '@repeat(1) selected correct node';
 
 # less common references
 {
+	no warnings;
     my $foo;
     $ref = [ \*foo, sub { }, \$foo ];
 }

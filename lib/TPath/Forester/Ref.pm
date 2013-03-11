@@ -261,9 +261,7 @@ Takes a reference and converts it into a tree.
 
 =cut
 
-sub rtree {
-    wrap(@_);
-}
+sub rtree { wrap(@_) }
 
 =func tfr
 
