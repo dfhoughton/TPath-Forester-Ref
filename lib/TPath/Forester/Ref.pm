@@ -1,6 +1,6 @@
 package TPath::Forester::Ref;
 
-# ABSTRACT: TPath::Forester that understands Perl structs
+# ABSTRACT: L<TPath::Forester> that understands Perl structs
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ package TPath::Forester::Ref;
   print scalar @hashes, "\n"; # 3
   my @arrays = tfr->path(q{//@array})->dsel($ref);
   print scalar @arrays, "\n"; # 3
-  print Dumper $arrays[2];
+  print Dumper $arrays[2];    # hash keys are sorted alphabetically
   # $VAR1 = [
   #           {
   #             'l' => 3,
@@ -258,6 +258,11 @@ Takes a reference and converts it into a tree.
   my $tree = TPath::Forester::Ref::Node->wrap(
       { foo => bar, baz => [qw(1 2 3 4)], qux => { quux => { corge => undef } } }
   );
+
+This is useful if you are going to be doing multiple selections from a single
+struct and want to use a common index. If you B<don't> use C<rtree> to work off
+a common object your index will give strange results as it won't be able to
+find the parents of your nodes.
 
 =cut
 
