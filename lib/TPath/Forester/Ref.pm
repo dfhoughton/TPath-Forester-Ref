@@ -261,7 +261,7 @@ find the parents of your nodes.
     no warnings 'redefine';
 
     sub wrap {
-        my ( $self, $n, %options ) = @_;
+        my ( $self, $n ) = @_;
         return $n if blessed($n) && $n->isa('TPath::Forester::Ref::Node');
         coerce($n);
     }
