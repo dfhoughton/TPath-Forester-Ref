@@ -11,13 +11,9 @@ treated as lists of key-value pairs in alphabetical order.
 
 use v5.10;
 use Moose;
-use Moose::Exporter;
-use Moose::Util qw(apply_all_roles);
 use namespace::autoclean;
 use Scalar::Util qw(blessed looks_like_number);
 use TPath::Forester::Ref::Root;
-
-Moose::Exporter->setup_import_methods( as_is => [ 'wrap', \&wrap ], );
 
 =attr value
 
@@ -166,47 +162,6 @@ sub _is_leaf_builder {
         return $first->is_root;
     }
     return @{ $self->children } && 1;
-}
-
-=method wrap
-
-Class method. Takes a reference and converts it into a tree.
-
-  my $tree = TPath::Forester::Ref::Node->wrap(
-      { foo => bar, baz => [qw(1 2 3 4)], qux => { quux => { corge => undef } } }
-  );
-
-=cut
-
-sub wrap {
-    my ( $ref, $root, $tag ) = @_;
-    my $node;
-    if ($root) {
-        $node = TPath::Forester::Ref::Node->new(
-            value => $ref,
-            _root => $root,
-            tag   => $tag,
-        );
-    }
-    else {
-        $root = TPath::Forester::Ref::Node->new( value => $ref, tag => undef );
-        apply_all_roles( $root, 'TPath::Forester::Ref::Root' );
-        $root->_add_root($root);
-        $node = $root;
-    }
-    $root->_cycle_check($node);
-    return $node if $node->is_repeated;
-    for ( $node->type ) {
-        when ('hash') {
-            for my $key ( sort keys %$ref ) {
-                push @{ $node->children }, wrap( $ref->{$key}, $root, $key );
-            }
-        }
-        when ('array') {
-            push @{ $node->children }, wrap( $_, $root ) for @$ref;
-        }
-    }
-    return $node;
 }
 
 sub _type_builder {

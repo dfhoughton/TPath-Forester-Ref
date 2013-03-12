@@ -20,7 +20,7 @@ my $ref = {
 };
 
 # vanilla structs
-my $iterator = iterate(<<'END', 2);
+my $iterator = iterate( <<'END', 2 );
 //@array
 3
 
@@ -61,12 +61,12 @@ my $iterator = iterate(<<'END', 2);
 1
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 # potential cycles
 my $repeat = [qw(a b c)];
-$ref = {d => $repeat, e => $repeat, f => $repeat };
-$iterator = iterate(<<'END', 2);
+$ref = { d => $repeat, e => $repeat, f => $repeat };
+$iterator = iterate( <<'END', 2 );
 //*
 7
 
@@ -80,18 +80,18 @@ $iterator = iterate(<<'END', 2);
 3
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 my $node = $f->path(q{//@repeat(1)})->select($ref);
 is $node->tag, 'e', '@repeat(1) selected correct node';
 
 # less common references
 {
-	no warnings;
+    no warnings;
     my $foo;
     $ref = [ \*foo, sub { }, \$foo ];
 }
-$iterator = iterate(<<'END', 2);
+$iterator = iterate( <<'END', 2 );
 //@glob
 1
 
@@ -102,20 +102,23 @@ $iterator = iterate(<<'END', 2);
 1
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 # simple classes
 package Foo;
 use Moose;
+
 package Bar;
 use Moose;
+
 package Baz;
 use Moose;
 extends 'Bar';
+
 package main;
 
-$ref = [Foo->new, Baz->new];
-$iterator = iterate(<<'END', 2);
+$ref = [ Foo->new, Baz->new ];
+$iterator = iterate( <<'END', 2 );
 //@obj
 2
 
@@ -129,37 +132,40 @@ $iterator = iterate(<<'END', 2);
 1
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 # roles
 package Quux;
 use Moose::Role;
+
 package Plugh;
 use Moose;
 with 'Quux';
+
 package main;
 
 $ref = { a => 1, b => Plugh->new };
-$iterator = iterate(<<'END', 2);
+$iterator = iterate( <<'END', 2 );
 //@does('Quux')
 1
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 # can
 package Corge;
 use Moose;
-sub grault {}
+sub grault { }
+
 package main;
 
 $ref = [ Corge->new, Corge->new, Corge->new ];
-$iterator = iterate(<<'END', 2);
+$iterator = iterate( <<'END', 2 );
 //@can('grault')
 3
 END
 
-count_test($ref, $iterator);
+count_test( $ref, $iterator );
 
 done_testing();
 

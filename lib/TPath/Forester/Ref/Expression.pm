@@ -4,26 +4,14 @@ package TPath::Forester::Ref::Expression;
 
 =head1 DESCRIPTION
 
-A L<TPath::Expression> that will automatically convert plain references like
-C<{ foo => [ 'a', 'b', 'c' ], bar => 1 }> into a L<TPath::Forester::Ref::Node>
-tree. These expressions can also be used on C<TPath::Forester::Ref::Node> trees
-directly.
+A L<TPath::Expression> that provides the C<dsel> method.
 
 =cut
 
 use Moose;
 use namespace::autoclean;
-use TPath::Forester::Ref::Node;
-use Scalar::Util qw(blessed);
 
 extends 'TPath::Expression';
-
-sub select {
-    my ( $self, $node ) = @_;
-    $node = wrap($node)
-      unless blessed($node) && $node->isa('TPath::Forester::Ref::Node');
-    $self->SUPER::select($node);
-}
 
 =method dsel
 

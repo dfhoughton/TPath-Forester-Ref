@@ -10,8 +10,8 @@ my $ref = {
     c => [ 1, { foo => 'bar' } ]
 };
 
-my $tree = rtree $ref;
-ok defined $tree, 'rtree wraps a ref';
+my $tree = tfr->wrap($ref);
+ok defined $tree, 'wrap wraps a ref';
 
 my $index = tfr->index($tree);
 ok defined $index, 'able to index wrapped tree';

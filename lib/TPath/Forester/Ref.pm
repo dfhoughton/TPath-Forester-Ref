@@ -38,14 +38,14 @@ data structures.
 
 use v5.10;
 use Moose;
+use Moose::Util qw(apply_all_roles);
 use Moose::Exporter;
 use MooseX::MethodAttributes;
 use namespace::autoclean;
 use TPath::Forester::Ref::Node;
 use TPath::Forester::Ref::Expression;
 
-Moose::Exporter->setup_import_methods(
-    as_is => [ rtree => \&rtree, tfr => \&tfr ], );
+Moose::Exporter->setup_import_methods( as_is => [ tfr => \&tfr ], );
 
 =head1 ROLES
 
@@ -53,24 +53,14 @@ L<TPath::Forester>
 
 =cut
 
-with 'TPath::Forester';
-
-around path => sub {
-    my ( $orig, $self, $expr ) = @_;
-    my $path = $self->$orig($expr);
-    bless $path, 'TPath::Forester::Ref::Expression';
-};
+with 'TPath::Forester' => { -excludes => 'wrap' };
 
 sub children {
     my ( $self, $n ) = @_;
     @{ $n->children };
 }
 
-sub has_tag {
-    my ( $self, $n, $tag ) = @_;
-    return 0 unless defined $n->tag;
-    $n->tag eq $tag;
-}
+sub tag { $_[1]->tag }
 
 sub matches_tag {
     my ( $self, $n, $re ) = @_;
@@ -162,7 +152,7 @@ Attribute that returns the hash key, if any, associated with the node value.
 
 =cut
 
-sub key : Attr { my ( $self, $n ) = @_; $n->tag; }
+sub key : Attr { $_[1]->tag }
 
 =method C<@num>
 
@@ -251,9 +241,10 @@ Attribute that is defined for any node holding the C<undef> value.
 sub is_undef :
   Attr(undef) { my ( $self, $n ) = @_; $n->type eq 'undef' ? 1 : undef; }
 
-=func rtree
+=func wrap
 
-Takes a reference and converts it into a tree.
+Takes a reference and converts it into a tree, overriding L<TPath::Forester>'s no-op C<wrap>
+method.
 
   my $tree = TPath::Forester::Ref::Node->wrap(
       { foo => bar, baz => [qw(1 2 3 4)], qux => { quux => { corge => undef } } }
@@ -266,7 +257,52 @@ find the parents of your nodes.
 
 =cut
 
-sub rtree { wrap(@_) }
+{
+    no warnings 'redefine';
+
+    sub wrap {
+        my ( $self, $n, %options ) = @_;
+        return $n if blessed($n) && $n->isa('TPath::Forester::Ref::Node');
+        coerce($n);
+    }
+}
+
+around path => sub {
+    my ( $orig, $self, $expr ) = @_;
+    my $path = $self->$orig($expr);
+    bless $path, 'TPath::Forester::Ref::Expression';
+};
+
+sub coerce {
+    my ( $ref, $root, $tag ) = @_;
+    my $node;
+    if ($root) {
+        $node = TPath::Forester::Ref::Node->new(
+            value => $ref,
+            _root => $root,
+            tag   => $tag,
+        );
+    }
+    else {
+        $root = TPath::Forester::Ref::Node->new( value => $ref, tag => undef );
+        apply_all_roles( $root, 'TPath::Forester::Ref::Root' );
+        $root->_add_root($root);
+        $node = $root;
+    }
+    $root->_cycle_check($node);
+    return $node if $node->is_repeated;
+    for ( $node->type ) {
+        when ('hash') {
+            for my $key ( sort keys %$ref ) {
+                push @{ $node->children }, coerce( $ref->{$key}, $root, $key );
+            }
+        }
+        when ('array') {
+            push @{ $node->children }, coerce( $_, $root ) for @$ref;
+        }
+    }
+    return $node;
+}
 
 =func tfr
 
