@@ -241,12 +241,12 @@ Attribute that is defined for any node holding the C<undef> value.
 sub is_undef :
   Attr(undef) { my ( $self, $n ) = @_; $n->type eq 'undef' ? 1 : undef; }
 
-=func wrap
+=method wrap
 
 Takes a reference and converts it into a tree, overriding L<TPath::Forester>'s no-op C<wrap>
 method.
 
-  my $tree = TPath::Forester::Ref::Node->wrap(
+  my $tree = tfr->wrap(
       { foo => bar, baz => [qw(1 2 3 4)], qux => { quux => { corge => undef } } }
   );
 
