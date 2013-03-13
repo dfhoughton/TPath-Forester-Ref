@@ -62,12 +62,6 @@ sub children {
 
 sub tag { $_[1]->tag }
 
-sub matches_tag {
-    my ( $self, $n, $re ) = @_;
-    return 0 unless defined $n->tag;
-    $n->tag =~ $re;
-}
-
 =method C<@array>
 
 Whether the node is an array ref.
