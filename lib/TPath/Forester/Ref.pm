@@ -251,7 +251,7 @@ method.
   );
 
 This is useful if you are going to be doing multiple selections from a single
-struct and want to use a common index. If you B<don't> use C<rtree> to work off
+struct and want to use a common index. If you B<don't> use C<wrap> to work off
 a common object your index will give strange results as it won't be able to
 find the parents of your nodes.
 
