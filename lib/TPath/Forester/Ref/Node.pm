@@ -12,7 +12,7 @@ treated as lists of key-value pairs in alphabetical order.
 use v5.10;
 use Moose;
 use namespace::autoclean;
-use Scalar::Util qw(blessed looks_like_number);
+use Scalar::Util qw(looks_like_number);
 use TPath::Forester::Ref::Root;
 
 =attr value
