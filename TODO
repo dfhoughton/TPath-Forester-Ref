@@ -3,4 +3,4 @@ Key
  - = discarded
  * = completed
 
-. make compatible with refactored TPath
+* make compatible with refactored TPath
