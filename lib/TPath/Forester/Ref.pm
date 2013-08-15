@@ -259,6 +259,7 @@ around path => sub {
     bless $path, 'TPath::Forester::Ref::Expression';
 };
 
+# acquaints all the nodes in a tree with their root
 sub coerce {
     my ( $ref, $root, $tag ) = @_;
     my $node;
