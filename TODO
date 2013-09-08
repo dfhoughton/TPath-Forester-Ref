@@ -3,5 +3,5 @@ Key
  - = discarded
  * = completed
 
-. put 'extends' in BEGIN block
+- put 'extends' in BEGIN block
 * make compatible with refactored TPath

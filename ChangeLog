@@ -1,6 +1,7 @@
 Revision history for TPath::Forester::Ref
 
 {{$NEXT}}
+  * modified tests to expect the node order produced by tpath 1.000
 
 0.003     2013-04-20 13:02:55 EST5EDT
   * removed some redundant code
